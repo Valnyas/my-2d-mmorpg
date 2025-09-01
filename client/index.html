@@ -1,1 +1,230 @@
-test
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D MMORPG - Мир приключений</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #2e86de, #0984e3);
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 60px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🌍 2D MMORPG</div>
+            <div class="tagline">Откройте мир приключений, сражений и собирательства!</div>
+        </header>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">⚔️</div>
+                <h3>Сражения</h3>
+                <p>Сражайтесь с монстрами и другими игроками в реальном времени</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🌿</div>
+                <h3>Собирательство</h3>
+                <p>Собирайте ресурсы, создавайте предметы и развивайте экономику</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>Сообщество</h3>
+                <p>Общайтесь, создавайте гильдии и исследуйте мир вместе</p>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <h2>Готовы к приключениям?</h2>
+            <p>Присоединяйтесь к нашему растущему сообществу!</p>
+            
+            <div style="margin: 30px 0;">
+                <button class="btn" onclick="startGame()">Начать игру</button>
+                <button class="btn btn-secondary" onclick="showDemo()">Демо</button>
+            </div>
+
+            <div class="status" id="status">
+                <p>🟢 Сервер работает</p>
+                <p id="playerCount">Игроков онлайн: 0</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>Создано с ❤️ на Python + FastAPI + Phaser</p>
+            <p>© 2024 2D MMORPG. Все права защищены.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Проверка статуса сервера
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    document.getElementById('status').innerHTML = 
+                        '<p>🟢 Сервер работает</p><p>Игроков онлайн: обновление...</p>';
+                    getPlayerCount();
+                }
+            } catch (error) {
+                document.getElementById('status').innerHTML = 
+                    '<p>🔴 Сервер недоступен</p><p>Попробуйте позже</p>';
+            }
+        }
+
+        // Получение количества игроков
+        async function getPlayerCount() {
+            try {
+                const response = await fetch('/api/players/count');
+                const data = await response.json();
+                document.getElementById('playerCount').textContent = 
+                    `Игроков онлайн: ${data.count}`;
+            } catch (error) {
+                console.log('Не удалось получить количество игроков');
+            }
+        }
+
+        // Запуск игры
+        function startGame() {
+            alert('Запуск игры... Скоро будет реализовано!');
+            // window.location.href = '/game.html';
+        }
+
+        // Демо
+        function showDemo() {
+            alert('Демо-версия будет доступна в ближайшее время!');
+        }
+
+        // Проверяем статус при загрузке
+        document.addEventListener('DOMContentLoaded', checkServerStatus);
+        
+        // Обновляем каждые 30 секунд
+        setInterval(checkServerStatus, 30000);
+    </script>
+</body>
+</html>
