@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build: ./server
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://test_admin:MvXTUa8D5JQzH4QvfdAGc5C6Sov7iZh6@dpg-d2qmgel6ubrc73djsbrg-a/test_game_db
+    depends_on:
+      - db
+    volumes:
+      - ./server:/app
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: test_game_db
+      POSTGRES_USER: test_admin
+      POSTGRES_PASSWORD: MvXTUa8D5JQzH4QvfdAGc5C6Sov7iZh6
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
