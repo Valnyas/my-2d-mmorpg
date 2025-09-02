@@ -1,22 +1,20 @@
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from .database import engine, Base  # Теперь импорт должен работать
-from . import models  # Важно: импортируем модели для создания таблиц
-
-# Создаем таблицы
-Base.metadata.create_all(bind=engine)
+import time
 
 app = FastAPI(title="2D MMORPG API", version="0.1.0")
 
-# CORS для разработки
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Для продакшена укажите конкретные домены
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Время запуска сервера
+SERVER_START_TIME = time.time()
 
 @app.get("/")
 def read_root():
@@ -24,21 +22,18 @@ def read_root():
 
 @app.get("/health")
 def health_check():
-    return {
-        "status": "healthy", 
-        "service": "2D MMORPG Backend",
-        "version": "0.1.0"
-    }
+    return {"status": "healthy", "service": "2D MMORPG Backend"}
 
-# Простой эндпоинт для теста базы данных
-@app.get("/test-db")
-def test_db():
-    try:
-        with engine.connect() as conn:
-            conn.execute("SELECT 1")
-        return {"database": "connected"}
-    except Exception as e:
-        return {"database": "error", "message": str(e)}
+@app.get("/api/uptime")
+def get_uptime():
+    """Возвращает время работы сервера"""
+    uptime_seconds = time.time() - SERVER_START_TIME
+    hours = int(uptime_seconds // 3600)
+    minutes = int((uptime_seconds % 3600) // 60)
+    seconds = int(uptime_seconds % 60)
+    return {"uptime": f"{hours}ч {minutes}м {seconds}с"}
 
-# Для обслуживания статических файлов (в продакшене)
-# app.mount("/", StaticFiles(directory="../client", html=True), name="client")
+@app.get("/api/players/count")
+def get_players_count():
+    """Заглушка для количества игроков"""
+    return {"count": 0}

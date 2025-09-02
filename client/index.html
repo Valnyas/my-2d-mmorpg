@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2D MMORPG - Мир приключений</title>
+    <title>2D MMORPG - Статус сервера</title>
     <style>
         * {
             margin: 0;
@@ -18,6 +18,9 @@
             animation: gradientBG 15s ease infinite;
             color: white;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         @keyframes gradientBG {
@@ -26,69 +29,83 @@
             100% { background-position: 0% 50%; }
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
+        .status-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
-            padding: 40px 0;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .logo {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: bold;
+            margin-bottom: 20px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .server-url {
             margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
         }
 
-        .tagline {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 30px;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin: 50px 0;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 30px;
+        .status-card {
+            margin: 20px 0;
+            padding: 20px;
             border-radius: 15px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s ease;
+            background: rgba(0, 0, 0, 0.2);
         }
 
-        .feature-card:hover {
-            transform: translateY(-5px);
+        .status-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
         }
 
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
+        .status-online {
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
         }
 
-        .cta-section {
-            text-align: center;
-            padding: 60px 0;
+        .status-offline {
+            background: #ff0000;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        .status-loading {
+            background: #ffff00;
+            box-shadow: 0 0 10px #ffff00;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .server-info {
+            margin: 15px 0;
+            font-size: 1.1rem;
         }
 
         .btn {
             display: inline-block;
-            padding: 15px 40px;
+            padding: 12px 30px;
             background: linear-gradient(45deg, #ff6b6b, #ee5a24);
             color: white;
             text-decoration: none;
-            border-radius: 50px;
-            font-size: 1.2rem;
+            border-radius: 25px;
             font-weight: bold;
             transition: all 0.3s ease;
             border: none;
@@ -101,130 +118,200 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        .btn-secondary {
-            background: linear-gradient(45deg, #2e86de, #0984e3);
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        .status {
+        .last-checked {
             margin-top: 20px;
-            padding: 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
 
-        footer {
-            text-align: center;
-            padding: 40px 0;
-            margin-top: 60px;
-            border-top: 1px solid rgba(255,255,255,0.2);
-        }
-
-        @media (max-width: 768px) {
-            .features {
-                grid-template-columns: 1fr;
-            }
-            
-            .logo {
-                font-size: 2rem;
-            }
+        .error-message {
+            color: #ff6b6b;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            display: none;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">🌍 2D MMORPG</div>
-            <div class="tagline">Откройте мир приключений, сражений и собирательства!</div>
-        </header>
+    <div class="status-container">
+        <div class="logo">🌍 2D MMORPG</div>
+        
+        <div class="server-url">
+            Сервер: https://my-game-test-nfbe.onrender.com
+        </div>
+        
+        <div class="status-card">
+            <h2>Статус сервера</h2>
+            
+            <div class="server-info">
+                <span id="status-indicator" class="status-indicator status-loading"></span>
+                <span id="status-text">Проверка соединения...</span>
+            </div>
 
-        <div class="features">
-            <div class="feature-card">
-                <div class="feature-icon">⚔️</div>
-                <h3>Сражения</h3>
-                <p>Сражайтесь с монстрами и другими игроками в реальном времени</p>
+            <div id="server-details" style="display: none;">
+                <div>🔄 Ping: <span id="ping-time">-</span> ms</div>
+                <div>👥 Игроков онлайн: <span id="player-count">0</span></div>
+                <div>🕒 Время работы: <span id="uptime">-</span></div>
             </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">🌿</div>
-                <h3>Собирательство</h3>
-                <p>Собирайте ресурсы, создавайте предметы и развивайте экономику</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">👥</div>
-                <h3>Сообщество</h3>
-                <p>Общайтесь, создавайте гильдии и исследуйте мир вместе</p>
-            </div>
+
+            <div id="error-message" class="error-message"></div>
         </div>
 
-        <div class="cta-section">
-            <h2>Готовы к приключениям?</h2>
-            <p>Присоединяйтесь к нашему растущему сообществу!</p>
-            
-            <div style="margin: 30px 0;">
-                <button class="btn" onclick="startGame()">Начать игру</button>
-                <button class="btn btn-secondary" onclick="showDemo()">Демо</button>
-            </div>
+        <button class="btn" id="refresh-btn" onclick="checkServerStatus()">
+            🔄 Обновить статус
+        </button>
 
-            <div class="status" id="status">
-                <p>🟢 Сервер работает</p>
-                <p id="playerCount">Игроков онлайн: 0</p>
-            </div>
+        <button class="btn" id="play-btn" disabled onclick="startGame()">
+            🎮 Начать игру
+        </button>
+
+        <div class="last-checked">
+            Последняя проверка: <span id="last-checked">-</span>
         </div>
-
-        <footer>
-            <p>Создано с ❤️ на Python + FastAPI + Phaser</p>
-            <p>© 2024 2D MMORPG. Все права защищены.</p>
-        </footer>
     </div>
 
     <script>
-        // Проверка статуса сервера
+        // Конфигурация сервера - используем ваш Render URL
+        const SERVER_URL = 'https://my-game-test-nfbe.onrender.com';
+
+        // Элементы DOM
+        const statusIndicator = document.getElementById('status-indicator');
+        const statusText = document.getElementById('status-text');
+        const serverDetails = document.getElementById('server-details');
+        const pingTime = document.getElementById('ping-time');
+        const playerCount = document.getElementById('player-count');
+        const uptime = document.getElementById('uptime');
+        const errorMessage = document.getElementById('error-message');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const playBtn = document.getElementById('play-btn');
+        const lastChecked = document.getElementById('last-checked');
+
+        // Функция проверки статуса сервера
         async function checkServerStatus() {
+            // Сбрасываем состояние
+            setStatus('loading', 'Проверка соединения...');
+            hideError();
+            refreshBtn.disabled = true;
+            serverDetails.style.display = 'none';
+
             try {
-                const response = await fetch('/health');
-                const data = await response.json();
+                const startTime = Date.now();
                 
-                if (data.status === 'healthy') {
-                    document.getElementById('status').innerHTML = 
-                        '<p>🟢 Сервер работает</p><p>Игроков онлайн: обновление...</p>';
-                    getPlayerCount();
+                // Проверяем базовый health endpoint
+                const healthResponse = await fetch(`${SERVER_URL}/health`, {
+                    signal: AbortSignal.timeout(10000) // Увеличиваем таймаут до 10 секунд для Render
+                });
+
+                const ping = Date.now() - startTime;
+
+                if (!healthResponse.ok) {
+                    throw new Error(`HTTP error! status: ${healthResponse.status}`);
                 }
+
+                const healthData = await healthResponse.json();
+
+                // Если сервер работает, получаем дополнительную информацию
+                let playersData = { count: 0 };
+                let uptimeData = { uptime: 'Недоступно' };
+
+                try {
+                    // Пытаемся получить количество игроков
+                    const playersResponse = await fetch(`${SERVER_URL}/api/players/count`);
+                    if (playersResponse.ok) {
+                        playersData = await playersResponse.json();
+                    }
+
+                    // Пытаемся получить время работы
+                    const uptimeResponse = await fetch(`${SERVER_URL}/api/uptime`);
+                    if (uptimeResponse.ok) {
+                        uptimeData = await uptimeResponse.json();
+                    }
+                } catch (infoError) {
+                    console.log('Дополнительная информация недоступна:', infoError);
+                }
+
+                // Обновляем UI
+                setStatus('online', 'Сервер работает ✓');
+                pingTime.textContent = ping;
+                playerCount.textContent = playersData.count || 0;
+                uptime.textContent = uptimeData.uptime || 'Недоступно';
+                serverDetails.style.display = 'block';
+                playBtn.disabled = false;
+
+                updateLastChecked();
+
             } catch (error) {
-                document.getElementById('status').innerHTML = 
-                    '<p>🔴 Сервер недоступен</p><p>Попробуйте позже</p>';
+                console.error('Ошибка проверки сервера:', error);
+                setStatus('offline', 'Сервер недоступен ✗');
+                
+                if (error.name === 'AbortError') {
+                    showError('Таймаут соединения: сервер не ответил за 10 секунд');
+                } else if (error.message.includes('Failed to fetch')) {
+                    showError('Не удалось подключиться к серверу. Проверьте интернет-соединение.');
+                } else {
+                    showError(`Ошибка: ${error.message}`);
+                }
+                
+                playBtn.disabled = true;
+            } finally {
+                refreshBtn.disabled = false;
             }
         }
 
-        // Получение количества игроков
-        async function getPlayerCount() {
-            try {
-                const response = await fetch('/api/players/count');
-                const data = await response.json();
-                document.getElementById('playerCount').textContent = 
-                    `Игроков онлайн: ${data.count}`;
-            } catch (error) {
-                console.log('Не удалось получить количество игроков');
+        // Вспомогательные функции
+        function setStatus(status, text) {
+            statusIndicator.className = 'status-indicator';
+            statusText.textContent = text;
+
+            switch(status) {
+                case 'online':
+                    statusIndicator.classList.add('status-online');
+                    break;
+                case 'offline':
+                    statusIndicator.classList.add('status-offline');
+                    break;
+                case 'loading':
+                    statusIndicator.classList.add('status-loading');
+                    break;
             }
         }
 
-        // Запуск игры
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        function updateLastChecked() {
+            const now = new Date();
+            lastChecked.textContent = now.toLocaleTimeString('ru-RU');
+        }
+
         function startGame() {
-            alert('Запуск игры... Скоро будет реализовано!');
-            // window.location.href = '/game.html';
+            alert('Игра запускается... Переход на игровой клиент');
+            // window.location.href = 'https://my-game-test-nfbe.onrender.com/game';
         }
 
-        // Демо
-        function showDemo() {
-            alert('Демо-версия будет доступна в ближайшее время!');
-        }
+        // Автопроверка при загрузке и каждые 30 секунд
+        document.addEventListener('DOMContentLoaded', () => {
+            checkServerStatus();
+            setInterval(checkServerStatus, 30000);
+        });
 
-        // Проверяем статус при загрузке
-        document.addEventListener('DOMContentLoaded', checkServerStatus);
-        
-        // Обновляем каждые 30 секунд
-        setInterval(checkServerStatus, 30000);
+        // Обработчик для кнопки обновления
+        refreshBtn.addEventListener('click', checkServerStatus);
     </script>
 </body>
 </html>
