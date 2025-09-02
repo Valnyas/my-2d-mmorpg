@@ -1,0 +1,26 @@
+{
+  "name": "mmorpg-client",
+  "version": "0.1.0",
+  "description": "2D MMORPG Phaser client",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "phaser": "^3.70.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "keywords": [
+    "phaser",
+    "mmorpg",
+    "game",
+    "2d"
+  ],
+  "author": "Valnyas",
+  "license": "MIT"
+}

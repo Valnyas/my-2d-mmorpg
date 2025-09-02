@@ -63,3 +63,16 @@ Thumbs.db
 *.log
 logs/
 EOL
+
+# Node.js
+client/node_modules/
+client/package-lock.json
+client/yarn.lock
+client/dist/
+client/.vite/
+
+# Assets (если большие, можно добавить в git LFS)
+client/src/assets/*.png
+client/src/assets/*.jpg
+client/src/assets/*.wav
+client/src/assets/*.mp3
